@@ -14,7 +14,7 @@ export default class StrcPricePanel extends Extension {
 
         this._label = new St.Label({
             text: '--',
-            y_align: Clutter.ActorAlign.END,
+            y_align: Clutter.ActorAlign.CENTER,
             style_class: 'strc-price-panel-label',
         });
         this._indicator.add_child(this._label);

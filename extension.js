@@ -1,6 +1,6 @@
 import St from 'gi://St';
 import GLib from 'gi://GLib';
-import Gio from 'gi://Gio';
+import Soup from 'gi://Soup';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -40,7 +40,7 @@ export default class StrcPricePanel extends Extension {
 
     disable() {
         if (this._timeoutId) {
-            GLib.source_remove(this._timeoutId);
+            GLib.source.remove(this._timeoutId);
             this._timeoutId = null;
         }
 
@@ -180,11 +180,9 @@ export default class StrcPricePanel extends Extension {
 
     _httpGet(url) {
         return new Promise((resolve, reject) => {
-            const session = new Gio.Session();
-            const msg = Gio.URI.request_new(url);
-            msg.set_headers(
-                'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
-            );
+            const session = new Soup.Session();
+            const msg = Soup.Message.new('GET', url);
+            msg.request_headers.set('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36');
 
             session.send_and_read_async(
                 msg,

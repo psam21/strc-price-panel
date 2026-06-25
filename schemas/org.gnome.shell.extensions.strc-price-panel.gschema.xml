@@ -10,10 +10,16 @@
     </key>
 
     <key name="refresh-interval" type="i">
-      <default>60</default>
-      <range min="10" max="3600"/>
-      <summary>Refresh interval in seconds</summary>
-      <description>How often to fetch the live price.</description>
+      <default>1</default>
+      <range min="1" max="10080"/>
+      <summary>Refresh interval value</summary>
+      <description>The number of refresh-units between fetches.</description>
+    </key>
+
+    <key name="refresh-unit" type="s">
+      <default>'min'</default>
+      <summary>Refresh interval unit</summary>
+      <description>Unit for the refresh interval. Options: min, hour, day, week.</description>
     </key>
 
     <key name="data-source" type="s">
@@ -84,7 +90,7 @@
     </key>
 
     <key name="font-size" type="i">
-      <default>110</default>
+      <default>100</default>
       <range min="60" max="200"/>
       <summary>Font size percentage</summary>
       <description>Font size relative to the panel (100 = default).</description>

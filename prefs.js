@@ -1,5 +1,6 @@
 import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
+import Gdk from 'gi://Gdk';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class StrcPricePanelPrefs extends ExtensionPreferences {
@@ -64,9 +65,9 @@ export default class StrcPricePanelPrefs extends ExtensionPreferences {
 
         const refreshSpin = new Gtk.SpinButton({
             adjustment: new Gtk.Adjustment({
-                lower: 10,
-                upper: 3600,
-                step_increment: 10,
+                lower: 1,
+                upper: 999,
+                step_increment: 1,
             }),
             value: settings.get_int('refresh-interval'),
             numeric: true,
@@ -74,7 +75,21 @@ export default class StrcPricePanelPrefs extends ExtensionPreferences {
         refreshSpin.connect('value_changed', (spin) => {
             settings.set_int('refresh-interval', Math.round(spin.value));
         });
-        box.append(this._row('Refresh interval (s)', refreshSpin));
+
+        const refreshUnitCombo = new Gtk.ComboBoxText({ hexpand: false });
+        refreshUnitCombo.append('min', 'Minutes');
+        refreshUnitCombo.append('hour', 'Hours');
+        refreshUnitCombo.append('day', 'Days');
+        refreshUnitCombo.append('week', 'Weeks');
+        refreshUnitCombo.set_active_id(settings.get_string('refresh-unit'));
+        refreshUnitCombo.connect('changed', (combo) => {
+            settings.set_string('refresh-unit', combo.get_active_id());
+        });
+
+        const refreshRow = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 6 });
+        refreshRow.append(refreshSpin);
+        refreshRow.append(refreshUnitCombo);
+        box.append(this._row('Refresh every', refreshRow));
 
         // --- Display ---
         box.append(this._sectionLabel('Display'));

@@ -61,7 +61,10 @@ export default class StrcPricePanel extends Extension {
             this._timeoutId = null;
         }
 
-        const seconds = Math.max(10, this._settings.get_int('refresh-interval'));
+        const value = Math.max(1, this._settings.get_int('refresh-interval'));
+        const unit = this._settings.get_string('refresh-unit');
+        const multipliers = { min: 60, hour: 3600, day: 86400, week: 604800 };
+        const seconds = value * (multipliers[unit] || 60);
         this._timeoutId = GLib.timeout_add_seconds(
             GLib.PRIORITY_DEFAULT,
             seconds,
@@ -74,7 +77,7 @@ export default class StrcPricePanel extends Extension {
 
     _applyStyle() {
         const fontSize = this._settings.get_int('font-size');
-        this._label.set_style(`font-size: ${fontSize}%;`);
+        this._label.set_style(`font-size: ${fontSize}%; font-weight: normal;`);
     }
 
     _refresh() {
@@ -114,11 +117,11 @@ export default class StrcPricePanel extends Extension {
                 const fontSize = this._settings.get_int('font-size');
 
                 if (prev !== null && prev !== undefined) {
-                    if (price > prev) this._label.set_style(`color: ${colorUp}; font-size: ${fontSize}%;`);
-                    else if (price < prev) this._label.set_style(`color: ${colorDown}; font-size: ${fontSize}%;`);
-                    else this._label.set_style(`color: ${colorNeutral}; font-size: ${fontSize}%;`);
+                    if (price > prev) this._label.set_style(`color: ${colorUp}; font-size: ${fontSize}%; font-weight: normal;`);
+                    else if (price < prev) this._label.set_style(`color: ${colorDown}; font-size: ${fontSize}%; font-weight: normal;`);
+                    else this._label.set_style(`color: ${colorNeutral}; font-size: ${fontSize}%; font-weight: normal;`);
                 } else {
-                    this._label.set_style(`color: ${textColor}; font-size: ${fontSize}%;`);
+                    this._label.set_style(`color: ${textColor}; font-size: ${fontSize}%; font-weight: normal;`);
                 }
 
                 this._lastPrice = price;
@@ -129,7 +132,7 @@ export default class StrcPricePanel extends Extension {
                 this._label.set_text(`${ticker} ??`);
                 const textColor = this._settings.get_string('text-color');
                 const fontSize = this._settings.get_int('font-size');
-                this._label.set_style(`color: ${textColor}; font-size: ${fontSize}%;`);
+                this._label.set_style(`color: ${textColor}; font-size: ${fontSize}%; font-weight: normal;`);
             });
     }
 
@@ -181,7 +184,7 @@ export default class StrcPricePanel extends Extension {
         return new Promise((resolve, reject) => {
             const session = new Soup.Session();
             const msg = Soup.Message.new('GET', url);
-            // User-Agent not needed for Yahoo Finance v8 endpoint
+            session.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36';
 
             session.send_and_read_async(
                 msg,

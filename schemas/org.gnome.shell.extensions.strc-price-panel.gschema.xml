@@ -2,15 +2,111 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.strc-price-panel"
           path="/org/gnome/shell/extensions/strc-price-panel/">
+
+    <key name="ticker" type="s">
+      <default>'STRC'</default>
+      <summary>Stock ticker symbol</summary>
+      <description>NASDAQ ticker to track (e.g. STRC, AAPL, MSFT).</description>
+    </key>
+
     <key name="refresh-interval" type="i">
       <default>60</default>
+      <range min="10" max="3600"/>
       <summary>Refresh interval in seconds</summary>
-      <description>How often to fetch the STRC price, in seconds.</description>
+      <description>How often to fetch the live price.</description>
     </key>
+
+    <key name="data-source" type="s">
+      <default>'yahoo'</default>
+      <summary>Data source</summary>
+      <description>Where to pull the price from. Options: yahoo, finnhub, custom.</description>
+    </key>
+
+    <key name="custom-url" type="s">
+      <default>''</default>
+      <summary>Custom API URL</summary>
+      <description>When data-source is "custom", this URL is fetched. Response must be JSON with a "price" field.</description>
+    </key>
+
+    <key name="finnhub-api-key" type="s">
+      <default>''</default>
+      <summary>Finnhub API key</summary>
+      <description>Required when data-source is "finnhub". Get a free key at https://finnhub.io.</description>
+    </key>
+
     <key name="show-arrow" type="b">
       <default>true</default>
-      <summary>Show up/down arrow</summary>
-      <description>Display a directional arrow indicating price movement.</description>
+      <summary>Show movement arrow</summary>
+      <description>Display ▲ / ▼ / – next to the price.</description>
     </key>
+
+    <key name="show-change" type="b">
+      <default>true</default>
+      <summary>Show change vs. last fetch</summary>
+      <description>Display the dollar change since the previous refresh.</description>
+    </key>
+
+    <key name="show-percent" type="b">
+      <default>false</default>
+      <summary>Show percent change</summary>
+      <description>Display the percentage change since the previous refresh.</description>
+    </key>
+
+    <key name="decimal-places" type="i">
+      <default>2</default>
+      <range min="0" max="6"/>
+      <summary>Decimal places</summary>
+      <description>Number of decimal places to display.</description>
+    </key>
+
+    <key name="color-up" type="s">
+      <default>'#4ae24a'</default>
+      <summary>Color when price is up</summary>
+      <description>Hex or CSS named color for upward movement.</description>
+    </key>
+
+    <key name="color-down" type="s">
+      <default>'#ff5555'</default>
+      <summary>Color when price is down</summary>
+      <description>Hex or CSS named color for downward movement.</description>
+    </key>
+
+    <key name="color-neutral" type="s">
+      <default>'#cccccc'</default>
+      <summary>Color when price is unchanged</summary>
+      <description>Hex or CSS named color for no movement.</description>
+    </key>
+
+    <key name="text-color" type="s">
+      <default>'#ffffff'</default>
+      <summary>Default text color</summary>
+      <description>Base text color when no movement color applies.</description>
+    </key>
+
+    <key name="font-size" type="i">
+      <default>110</default>
+      <range min="60" max="200"/>
+      <summary>Font size percentage</summary>
+      <description>Font size relative to the panel (100 = default).</description>
+    </key>
+
+    <key name="prefix" type="s">
+      <default>'$'</default>
+      <summary>Price prefix</summary>
+      <description>Text shown before the price (e.g. $, €, £).</description>
+    </key>
+
+    <key name="position" type="s">
+      <default>'right'</default>
+      <summary>Panel position</summary>
+      <description>Where on the top panel to display. Options: left, center, right.</description>
+    </key>
+
+    <key name="panel-order" type="i">
+      <default>0</default>
+      <summary>Order within the position</summary>
+      <description>Sort order within the panel slot (lower = further left/right depending on position).</description>
+    </key>
+
   </schema>
 </schemalist>

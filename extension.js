@@ -5,42 +5,41 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const TICKER = 'STRC';
-const YAHOO_URL = `https://query1.finance.yahoo.com/v8/finance/chart/${TICKER}?interval=1d&range=1d`;
-
 export default class StrcPricePanel extends Extension {
     enable() {
         this._settings = this.getSettings();
 
-        this._indicator = new PanelMenu.Button(0.0, 'STRC Price Panel', false);
+        this._indicator = new PanelMenu.Button(0.0, 'Price Panel', false);
 
         this._label = new St.Label({
-            text: 'STRC --',
+            text: '--',
             y_align: St.Align.MIDDLE,
             style_class: 'strc-price-panel-label',
         });
         this._indicator.add_child(this._label);
 
-        // Add to the right side of the top panel (after the clock area).
-        Main.panel.addToStatusArea('strc-price-panel', this._indicator, 0, 'right');
+        const position = this._settings.get_string('position');
+        Main.panel.addToStatusArea(
+            'strc-price-panel',
+            this._indicator,
+            this._settings.get_int('panel-order'),
+            position
+        );
 
-        // Apply user stylesheet so our color classes take effect.
-        Main.panel.add_style_class_name('strc-price-panel-label');
+        this._applyStyle();
+        this._refresh();
 
-        // Track settings changes.
         this._settingsSignalId = this._settings.connect('changed', () => {
+            this._applyStyle();
+            this._scheduleRefresh();
             this._refresh();
         });
 
-        // Initial fetch.
-        this._refresh();
-
-        // Schedule recurring fetch based on the configured interval.
         this._scheduleRefresh();
     }
 
     disable() {
-        if(this._timeoutId) {
+        if (this._timeoutId) {
             GLib.source_remove(this._timeoutId);
             this._timeoutId = null;
         }
@@ -59,7 +58,7 @@ export default class StrcPricePanel extends Extension {
 
     _scheduleRefresh() {
         if (this._timeoutId) {
-            GLib.source_remove(this._timeoutId);
+            GLib.source.remove(this._timeoutId);
             this._timeoutId = null;
         }
 
@@ -74,34 +73,64 @@ export default class StrcPricePanel extends Extension {
         );
     }
 
+    _applyStyle() {
+        const fontSize = this._settings.get_int('font-size');
+        this._label.set_style(`font-size: ${fontSize}%;`);
+    }
+
     _refresh() {
         this._fetchPrice()
             .then(({ price, prev }) => {
-                const arrow = this._settings.get_boolean('show-arrow')
-                    ? this._arrowFor(price, prev)
-                    : '';
-                const sign = price >= prev ? '+' : '';
-                const change = prev ? `${sign}${(price - prev).toFixed(2)}` : '';
-                this._label.set_text(`STRC $${price.toFixed(2)} ${change} ${arrow}`.trim());
+                const ticker = this._settings.get_string('ticker').toUpperCase();
+                const prefix = this._settings.get_string('prefix');
+                const decimals = this._settings.get_int('decimal-places');
+                const showArrow = this._settings.get_boolean('show-arrow');
+                const showChange = this._settings.get_boolean('show-change');
+                const showPercent = this._settings.get_boolean('show-percent');
 
-                // Color class based on movement.
-                this._label.remove_style_class_name('up');
-                this._label.remove_style_class_name('down');
-                this._label.remove_style_class_name('neutral');
-                if (prev) {
-                    if (price > prev) this._label.add_style_class_name('up');
-                    else if (price < prev) this._label.add_style_class_name('down');
-                    else this._label.add_style_class_name('neutral');
+                let text = `${ticker} ${prefix}${price.toFixed(decimals)}`;
+
+                if (showChange && prev !== null && prev !== undefined) {
+                    const delta = price - prev;
+                    const sign = delta >= 0 ? '+' : '';
+                    text += ` ${sign}${prefix}${delta.toFixed(decimals)}`;
+                }
+
+                if (showPercent && prev !== null && prev !== undefined && prev !== 0) {
+                    const pct = ((price - prev) / prev) * 100;
+                    const sign = pct >= 0 ? '+' : '';
+                    text += ` (${sign}${pct.toFixed(2)}%)`;
+                }
+
+                if (showArrow) {
+                    text += ` ${this._arrowFor(price, prev)}`;
+                }
+
+                this._label.set_text(text.trim());
+
+                const colorUp = this._settings.get_string('color-up');
+                const colorDown = this._settings.get_string('color-down');
+                const colorNeutral = this._settings.get_string('color-neutral');
+                const textColor = this._settings.get_string('text-color');
+                const fontSize = this._settings.get_int('font-size');
+
+                if (prev !== null && prev !== undefined) {
+                    if (price > prev) this._label.set_style(`color: ${colorUp}; font-size: ${fontSize}%;`);
+                    else if (price < prev) this._label.set_style(`color: ${colorDown}; font-size: ${fontSize}%;`);
+                    else this._label.set_style(`color: ${colorNeutral}; font-size: ${fontSize}%;`);
+                } else {
+                    this._label.set_style(`color: ${textColor}; font-size: ${fontSize}%;`);
                 }
 
                 this._lastPrice = price;
             })
             .catch((err) => {
                 console.error(`[strc-price-panel] fetch failed: ${err.message}`);
-                this._label.set_text('STRC ??');
-                this._label.remove_style_class_name('up');
-                this._label.remove_style_class_name('down');
-                this._label.add_style_class_name('neutral');
+                const ticker = this._settings.get_string('ticker').toUpperCase();
+                this._label.set_text(`${ticker} ??`);
+                const textColor = this._settings.get_string('text-color');
+                const fontSize = this._settings.get_int('font-size');
+                this._label.set_style(`color: ${textColor}; font-size: ${fontSize}%;`);
             });
     }
 
@@ -114,11 +143,45 @@ export default class StrcPricePanel extends Extension {
 
     async _fetchPrice() {
         const prev = this._lastPrice ?? null;
+        const ticker = this._settings.get_string('ticker').toUpperCase();
+        const source = this._settings.get_string('data-source');
 
-        const result = await new Promise((resolve, reject) => {
+        let url;
+        if (source === 'finnhub') {
+            const apiKey = this._settings.get_string('finnhub-api-key');
+            if (!apiKey) throw new Error('Finnhub API key is required');
+            url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+        } else if (source === 'custom') {
+            url = this._settings.get_string('custom-url');
+            if (!url) throw new Error('Custom URL is required');
+        } else {
+            url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+        }
+
+        const result = await this._httpGet(url);
+        const price = this._parsePrice(source, result);
+
+        if (typeof price !== 'number' || isNaN(price)) {
+            throw new Error('Invalid price value');
+        }
+
+        return { price, prev };
+    }
+
+    _parsePrice(source, json) {
+        if (source === 'finnhub') {
+            return json.c;
+        }
+        if (source === 'custom') {
+            return parseFloat(json.price);
+        }
+        return json?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    }
+
+    _httpGet(url) {
+        return new Promise((resolve, reject) => {
             const session = new Gio.Session();
-            const msg = Gio.URI.request_new(YAHOO_URL);
-            // Yahoo's v8 endpoint requires a User-Agent header.
+            const msg = Gio.URI.request_new(url);
             msg.set_headers(
                 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
             );
@@ -138,17 +201,5 @@ export default class StrcPricePanel extends Extension {
                 }
             );
         });
-
-        const meta = result?.chart?.result?.[0]?.meta;
-        if (!meta) {
-            throw new Error('No price data in response');
-        }
-
-        const price = meta.regularMarketPrice;
-        if (typeof price !== 'number') {
-            throw new Error('Invalid price value');
-        }
-
-        return { price, prev };
     }
 }

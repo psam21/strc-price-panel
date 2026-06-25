@@ -1,18 +1,4 @@
 .strc-price-panel-label {
     font-weight: bold;
-    font-size: 110%;
     padding: 0 6px;
-    color: #ffffff;
-}
-
-.strc-price-panel-label.up {
-    color: #4ae24a;
-}
-
-.strc-price-panel-label.down {
-    color: #ff5555;
-}
-
-.strc-price-panel-label.neutral {
-    color: #cccccc;
 }

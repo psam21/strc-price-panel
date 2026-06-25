@@ -1,5 +1,5 @@
 {
-  "description": "Show a live stock price in the top panel with full customization for ticker, colors, data source, display format, and position.",
+  "description": "Show a live stock price in the top panel with full customization for ticker, colors, data source, display format, and refresh rate.",
   "name": "Stock Price Panel",
   "settings-schema": "org.gnome.shell.extensions.strc-price-panel",
   "shell-version": [
@@ -8,6 +8,5 @@
     "50"
   ],
   "url": "https://github.com/psam21/strc-price-panel",
-  "uuid": "strc-price-panel@custom.github.com",
-  "version": 2
+  "uuid": "strc-price-panel@custom.github.com"
 }

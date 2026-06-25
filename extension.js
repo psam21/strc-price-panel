@@ -13,7 +13,6 @@ export default class StrcPricePanel extends Extension {
 
         this._label = new St.Label({
             text: '--',
-            y_align: St.Align.MIDDLE,
             style_class: 'strc-price-panel-label',
         });
         this._indicator.add_child(this._label);
@@ -182,7 +181,7 @@ export default class StrcPricePanel extends Extension {
         return new Promise((resolve, reject) => {
             const session = new Soup.Session();
             const msg = Soup.Message.new('GET', url);
-            msg.request_headers.set('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36');
+            // User-Agent not needed for Yahoo Finance v8 endpoint
 
             session.send_and_read_async(
                 msg,

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.strc-price-panel"
+          path="/org/gnome/shell/extensions/strc-price-panel/">
+    <key name="refresh-interval" type="i">
+      <default>60</default>
+      <summary>Refresh interval in seconds</summary>
+      <description>How often to fetch the STRC price, in seconds.</description>
+    </key>
+    <key name="show-arrow" type="b">
+      <default>true</default>
+      <summary>Show up/down arrow</summary>
+      <description>Display a directional arrow indicating price movement.</description>
+    </key>
+  </schema>
+</schemalist>

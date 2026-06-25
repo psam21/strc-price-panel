@@ -1,0 +1,13 @@
+{
+  "description": "Show the live STRC stock price from NASDAQ in the top panel, refreshing every minute.",
+  "name": "STRC Price Panel",
+  "settings-schema": "org.gnome.shell.extensions.strc-price-panel",
+  "shell-version": [
+    "48",
+    "49",
+    "50"
+  ],
+  "url": "https://github.com/your-org/strc-price-panel",
+  "uuid": "strc-price-panel@custom.github.com",
+  "version": 1
+}

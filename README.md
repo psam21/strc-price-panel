@@ -42,6 +42,9 @@ gnome-extensions enable strc-price-panel@custom.github.com
 # Restart GNOME Shell
 #   X11: Alt+F2 → type 'r' → Enter
 #   Wayland: log out and log back in
+# 
+# Note: On Wayland, GNOME Shell only discovers new extensions at startup.
+# After installing, you must log out and log back in for the extension to appear.
 ```
 
 ### Dependencies

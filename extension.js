@@ -1,4 +1,5 @@
 import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Soup from 'gi://Soup';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -13,6 +14,7 @@ export default class StrcPricePanel extends Extension {
 
         this._label = new St.Label({
             text: '--',
+            y_align: Clutter.ActorAlign.END,
             style_class: 'strc-price-panel-label',
         });
         this._indicator.add_child(this._label);

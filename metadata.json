@@ -8,5 +8,6 @@
     "50"
   ],
   "url": "https://github.com/psam21/strc-price-panel",
-  "uuid": "strc-price-panel@custom.github.com"
+  "uuid": "strc-price-panel@custom.github.com",
+  "extension-id": 10287
 }

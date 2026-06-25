@@ -2,7 +2,9 @@
 
 A GNOME Shell extension that shows a live stock price in the top panel with full customization.
 
-![GNOME Shell 48/49/50](https://img.shields.io/badge/GNOME%20Shell-48%2F49%2F50-blue)
+[![GNOME Shell Extensions](https://img.shields.io/badge/GNOME%20Shell-48%2F49%2F50-blue)](https://extensions.gnome.org/extension/10287/stock-price-panel/)
+
+[![extensions.gnome.org](https://extensions.gnome.org/static/images/gnome-extensions.2635f103c955.svg)](https://extensions.gnome.org/extension/10287/stock-price-panel/)
 
 ## Features
 
